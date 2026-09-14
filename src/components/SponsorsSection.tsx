@@ -70,7 +70,7 @@ export default function SponsorsSection() {
             {/* Logos Image Banner */}
             <div className="w-full flex items-center justify-center py-2 sm:py-4">
               <Image
-                src="/eventmakers.png"
+                src="/event.png"
                 alt="صناع الحدث ورعاة المبادرة"
                 width={1800}
                 height={360}
