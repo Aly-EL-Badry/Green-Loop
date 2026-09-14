@@ -52,6 +52,206 @@ interface Achievement {
   unlocked: boolean;
 }
 
+// A fixed "average lifestyle" reference point, used only to judge which
+// category is relatively worse for THIS person — not shown to the user.
+const BASELINE_DATA: DetailedData = {
+  transportation: {
+    car: { type: "sedan", distance: 25, days: 5 },
+    publicTransport: { type: "bus", distance: 10, days: 2 },
+    flights: { shortHaul: 2, longHaul: 1 },
+  },
+  electricity: {
+    source: "mixed",
+    usage: 18,
+    heating: "ac",
+    heatingUsage: 3,
+  },
+  food: {
+    breakfast: "vegetarian",
+    lunch: "meat",
+    dinner: "meat",
+    dairy: 2,
+    localProduce: false,
+    organic: false,
+  },
+  consumption: {
+    clothing: "moderate",
+    electronics: "moderate",
+    waste: "recycle-most",
+    waterUsage: "average",
+  },
+};
+
+// Pure calculation — takes any DetailedData so it can score both the
+// user's current answers and the fixed baseline above.
+function calculateDetailedEmissions(data: DetailedData) {
+  let total = 0;
+  const breakdown: Record<string, number> = {};
+
+  // Transportation
+  let transportTotal = 0;
+
+  // Cars
+  if (data.transportation.car) {
+    const carEmissions: Record<string, number> = {
+      sedan: 0.21,
+      suv: 0.28,
+      electric: 0.05,
+      hybrid: 0.12,
+    };
+    const carKg =
+      (data.transportation.car.distance *
+        carEmissions[data.transportation.car.type] *
+        data.transportation.car.days) /
+      7;
+    transportTotal += carKg;
+  }
+
+  // Public transport
+  if (data.transportation.publicTransport) {
+    const ptEmissions: Record<string, number> = {
+      bus: 0.089,
+      train: 0.041,
+      tram: 0.035,
+    };
+    const ptKg =
+      (data.transportation.publicTransport.distance *
+        ptEmissions[data.transportation.publicTransport.type] *
+        data.transportation.publicTransport.days) /
+      7;
+    transportTotal += ptKg;
+  }
+
+  // Flights (per year, convert to daily)
+  if (data.transportation.flights) {
+    const flightKg =
+      (data.transportation.flights.shortHaul * 0.18 +
+        data.transportation.flights.longHaul * 0.75) /
+      365;
+    transportTotal += flightKg;
+  }
+
+  breakdown.transportation = transportTotal;
+  total += transportTotal;
+
+  // Electricity & Heating
+  let energyTotal = 0;
+
+  const sourceEmissions: Record<string, number> = {
+    coal: 1.0,
+    gas: 0.5,
+    renewable: 0.02,
+    mixed: 0.4,
+  };
+  const electricityKg =
+    data.electricity.usage * sourceEmissions[data.electricity.source];
+  energyTotal += electricityKg;
+
+  // Heating / Cooling
+  if (
+    data.electricity.heating === "ac" ||
+    data.electricity.heating === "electric"
+  ) {
+    energyTotal += (data.electricity.heatingUsage * 5.3) / 30; // kWh equivalent
+  } else if (data.electricity.heating === "gas") {
+    energyTotal += (data.electricity.heatingUsage * 1.89) / 30; // gas to kg CO2
+  }
+
+  breakdown.energy = energyTotal;
+  total += energyTotal;
+
+  // Food
+  let foodTotal = 0;
+
+  const mealEmissions: Record<string, number> = {
+    vegan: 1.5,
+    vegetarian: 2.5,
+    meat: 5.0,
+  };
+
+  foodTotal +=
+    mealEmissions[data.food.breakfast] +
+    mealEmissions[data.food.lunch] +
+    mealEmissions[data.food.dinner];
+
+  // Dairy
+  foodTotal += data.food.dairy * 1.2;
+
+  // Bonuses
+  if (data.food.localProduce) foodTotal *= 0.85;
+  if (data.food.organic) foodTotal *= 0.9;
+
+  breakdown.food = foodTotal;
+  total += foodTotal;
+
+  // Consumption
+  let consumptionTotal = 0;
+
+  const clothingEmissions: Record<string, number> = {
+    minimal: 1.0,
+    moderate: 3.5,
+    frequent: 7.0,
+  };
+  consumptionTotal += clothingEmissions[data.consumption.clothing];
+
+  const electronicsEmissions: Record<string, number> = {
+    minimal: 0.5,
+    moderate: 2.0,
+    frequent: 5.0,
+  };
+  consumptionTotal += electronicsEmissions[data.consumption.electronics];
+
+  const wasteEmissions: Record<string, number> = {
+    "recycle-all": 1.0,
+    "recycle-most": 2.5,
+    "little-recycle": 5.0,
+  };
+  consumptionTotal += wasteEmissions[data.consumption.waste];
+
+  const waterEmissions: Record<string, number> = {
+    low: 0.5,
+    average: 1.5,
+    high: 3.0,
+  };
+  consumptionTotal += waterEmissions[data.consumption.waterUsage];
+
+  breakdown.consumption = consumptionTotal;
+  total += consumptionTotal;
+
+  return {
+    total: parseFloat(total.toFixed(2)),
+    breakdown,
+  };
+}
+
+const BASELINE_EMISSIONS = calculateDetailedEmissions(BASELINE_DATA);
+
+// Reference ceiling (kg CO2/day) used only to scale the result into a
+// 0-100% bar and a Low/Medium/High label.
+const SCALE_MAX = 50;
+
+function getFootprintLevel(percentage: number) {
+  if (percentage < 40) {
+    return {
+      label: "منخفض",
+      badgeClass: "bg-eco-100 text-eco-700",
+      gradient: "from-eco-500 to-eco-700",
+    };
+  }
+  if (percentage < 70) {
+    return {
+      label: "متوسط",
+      badgeClass: "bg-amber-100 text-amber-700",
+      gradient: "from-amber-400 to-amber-600",
+    };
+  }
+  return {
+    label: "مرتفع",
+    badgeClass: "bg-red-100 text-red-700",
+    gradient: "from-red-500 to-red-700",
+  };
+}
+
 export default function AdvancedCarbonCalculator() {
   const [step, setStep] = useState(1);
   const tipsRef = useRef<HTMLDivElement>(null);
@@ -83,148 +283,11 @@ export default function AdvancedCarbonCalculator() {
     },
   });
 
-  // Detailed calculation
-  const calculateDetailedEmissions = () => {
-    let total = 0;
-    const breakdown: Record<string, number> = {};
+  // Detailed calculation for the user's current answers
+  const emissions = calculateDetailedEmissions(data);
 
-    // Transportation
-    let transportTotal = 0;
-
-    // Cars
-    if (data.transportation.car) {
-      const carEmissions: Record<string, number> = {
-        sedan: 0.21,
-        suv: 0.28,
-        electric: 0.05,
-        hybrid: 0.12,
-      };
-      const carKg =
-        (data.transportation.car.distance *
-          carEmissions[data.transportation.car.type] *
-          data.transportation.car.days) /
-        7;
-      transportTotal += carKg;
-    }
-
-    // Public transport
-    if (data.transportation.publicTransport) {
-      const ptEmissions: Record<string, number> = {
-        bus: 0.089,
-        train: 0.041,
-        tram: 0.035,
-      };
-      const ptKg =
-        (data.transportation.publicTransport.distance *
-          ptEmissions[data.transportation.publicTransport.type] *
-          data.transportation.publicTransport.days) /
-        7;
-      transportTotal += ptKg;
-    }
-
-    // Flights (per year, convert to daily)
-    if (data.transportation.flights) {
-      const flightKg =
-        (data.transportation.flights.shortHaul * 0.18 +
-          data.transportation.flights.longHaul * 0.75) /
-        365;
-      transportTotal += flightKg;
-    }
-
-    breakdown.transportation = transportTotal;
-    total += transportTotal;
-
-    // Electricity & Heating
-    let energyTotal = 0;
-
-    const sourceEmissions: Record<string, number> = {
-      coal: 1.0,
-      gas: 0.5,
-      renewable: 0.02,
-      mixed: 0.4,
-    };
-    const electricityKg =
-      data.electricity.usage * sourceEmissions[data.electricity.source];
-    energyTotal += electricityKg;
-
-    // Heating / Cooling
-    if (
-      data.electricity.heating === "ac" ||
-      data.electricity.heating === "electric"
-    ) {
-      energyTotal += (data.electricity.heatingUsage * 5.3) / 30; // kWh equivalent
-    } else if (data.electricity.heating === "gas") {
-      energyTotal += (data.electricity.heatingUsage * 1.89) / 30; // gas to kg CO2
-    }
-
-    breakdown.energy = energyTotal;
-    total += energyTotal;
-
-    // Food
-    let foodTotal = 0;
-
-    const mealEmissions: Record<string, number> = {
-      vegan: 1.5,
-      vegetarian: 2.5,
-      meat: 5.0,
-    };
-
-    foodTotal +=
-      mealEmissions[data.food.breakfast] +
-      mealEmissions[data.food.lunch] +
-      mealEmissions[data.food.dinner];
-
-    // Dairy
-    foodTotal += data.food.dairy * 1.2;
-
-    // Bonuses
-    if (data.food.localProduce) foodTotal *= 0.85;
-    if (data.food.organic) foodTotal *= 0.9;
-
-    breakdown.food = foodTotal;
-    total += foodTotal;
-
-    // Consumption
-    let consumptionTotal = 0;
-
-    const clothingEmissions: Record<string, number> = {
-      minimal: 1.0,
-      moderate: 3.5,
-      frequent: 7.0,
-    };
-    consumptionTotal += clothingEmissions[data.consumption.clothing];
-
-    const electronicsEmissions: Record<string, number> = {
-      minimal: 0.5,
-      moderate: 2.0,
-      frequent: 5.0,
-    };
-    consumptionTotal += electronicsEmissions[data.consumption.electronics];
-
-    const wasteEmissions: Record<string, number> = {
-      "recycle-all": 1.0,
-      "recycle-most": 2.5,
-      "little-recycle": 5.0,
-    };
-    consumptionTotal += wasteEmissions[data.consumption.waste];
-
-    const waterEmissions: Record<string, number> = {
-      low: 0.5,
-      average: 1.5,
-      high: 3.0,
-    };
-    consumptionTotal += waterEmissions[data.consumption.waterUsage];
-
-    breakdown.consumption = consumptionTotal;
-    total += consumptionTotal;
-
-    return {
-      total: parseFloat(total.toFixed(2)),
-      breakdown,
-    };
-  };
-
-  const emissions = calculateDetailedEmissions();
+  const percentage = Math.min(100, (emissions.total / SCALE_MAX) * 100);
+  const footprintLevel = getFootprintLevel(percentage);
 
   // Achievements
   const getAchievements = (): Achievement[] => {
@@ -457,10 +520,16 @@ export default function AdvancedCarbonCalculator() {
 
   const rawTips = generateAdvancedTips();
 
-  // Prioritize tips from whichever category contributes most to this result
-  const dominantCategory = Object.entries(emissions.breakdown).sort(
-    (a, b) => b[1] - a[1],
-  )[0]?.[0];
+  // Prioritize tips from whichever category is relatively worse than an
+  // average lifestyle — comparing raw kg would almost always point to food
+  // since its baseline number is naturally larger than e.g. transportation.
+  const dominantCategory = Object.keys(emissions.breakdown).sort((a, b) => {
+    const ratioA =
+      emissions.breakdown[a] / (BASELINE_EMISSIONS.breakdown[a] || 1);
+    const ratioB =
+      emissions.breakdown[b] / (BASELINE_EMISSIONS.breakdown[b] || 1);
+    return ratioB - ratioA;
+  })[0];
 
   const tips = [...rawTips].sort((a, b) => {
     if (a.category === dominantCategory && b.category !== dominantCategory)
@@ -512,7 +581,7 @@ export default function AdvancedCarbonCalculator() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-eco-600 to-eco-700 bg-clip-text text-transparent mb-4">
+          <h2 className="text-5xl md:text-6xl font-extrabold leading-[1.3] py-2 bg-gradient-to-r from-eco-600 to-eco-700 bg-clip-text text-transparent mb-2">
             حاسبة البصمة الكربونية المتقدمة
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -1178,7 +1247,14 @@ export default function AdvancedCarbonCalculator() {
           {/* Results Sidebar */}
           <div className="space-y-6">
             {/* Main Result */}
-            <div className="bg-gradient-to-br from-eco-500 to-eco-700 rounded-3xl p-8 text-white text-center">
+            <div
+              className={`bg-gradient-to-br ${footprintLevel.gradient} rounded-3xl p-8 text-white text-center transition-colors duration-500`}
+            >
+              <span
+                className={`inline-block px-4 py-1 rounded-full text-xs font-bold mb-4 ${footprintLevel.badgeClass}`}
+              >
+                {footprintLevel.label}
+              </span>
               <p className="text-sm opacity-90 mb-2">بصمتك الكربونية اليومية</p>
               <p className="text-6xl font-black mb-2">{emissions.total}</p>
               <p className="text-lg font-semibold mb-4">كيلوغرام CO₂</p>
@@ -1239,7 +1315,7 @@ export default function AdvancedCarbonCalculator() {
 
             {/* Achievements */}
             {achievements.length > 0 && (
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl border border-amber-200 p-6">
+              <div className="bg-white rounded-3xl border border-amber-200 p-6">
                 <h4 className="font-bold text-foreground mb-3">🏆 الإنجازات</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {achievements.map((a, i) => (
