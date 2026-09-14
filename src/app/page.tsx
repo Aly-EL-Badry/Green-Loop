@@ -2,7 +2,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import SponsorsSection from "@/components/SponsorsSection";
 import Footer from "@/components/Footer";
-
+import AdvancedCarbonCalculator from "@/components/AdvancedCarbonCalculator";
 export default function Home() {
   return (
     <>
@@ -14,6 +14,7 @@ export default function Home() {
           style={{ transform: "rotate(45deg)", right: "calc(-10% - 200px)" }}
         />
         <HeroSection />
+        <AdvancedCarbonCalculator />  {/* Replace the old one */}
         <SponsorsSection />
       </div>
       <Footer />
