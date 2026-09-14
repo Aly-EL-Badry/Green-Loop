@@ -382,8 +382,8 @@ export default function AdvancedCarbonCalculator() {
     }
 
     if (
-     (data.transportation.flights?.longHaul ?? 0) === 0 &&
-     (data.transportation.flights?.shortHaul ?? 0) === 0
+      (data.transportation.flights?.longHaul ?? 0) === 0 &&
+      (data.transportation.flights?.shortHaul ?? 0) === 0
     ) {
       achievements.push({
         icon: "✈️",
@@ -439,8 +439,8 @@ export default function AdvancedCarbonCalculator() {
     }
 
     if (
-     (data.transportation.flights?.longHaul ?? 0) > 1 ||
-     (data.transportation.flights?.shortHaul ?? 0) > 4
+      (data.transportation.flights?.longHaul ?? 0) > 1 ||
+      (data.transportation.flights?.shortHaul ?? 0) > 4
     ) {
       tips.push({
         category: "transportation",
@@ -581,7 +581,8 @@ export default function AdvancedCarbonCalculator() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-6xl font-extrabold leading-[1.3] py-2 bg-gradient-to-r from-eco-600 to-eco-700 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.3] py-2 bg-gradient-to-r from-eco-600 to-eco-700 bg-clip-text text-transparent mb-2">
+            {" "}
             حاسبة البصمة الكربونية المتقدمة
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -602,9 +603,9 @@ export default function AdvancedCarbonCalculator() {
                   : "bg-white border-eco-200 text-gray-700 hover:border-eco-400"
               }`}
             >
-              <div className="text-3xl mb-2">{s.icon}</div>
-              <p className="font-bold text-sm">{s.title}</p>
-              <p className="text-xs opacity-75">{s.desc}</p>
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{s.icon}</div>
+              <p className="font-bold text-xs sm:text-sm">{s.title}</p>
+              <p className="text-xs opacity-75 hidden sm:block">{s.desc}</p>
             </button>
           ))}
         </div>
@@ -620,7 +621,7 @@ export default function AdvancedCarbonCalculator() {
                 </h3>
 
                 {/* Car */}
-                <div className="bg-white rounded-3xl border border-eco-200/60 p-6 md:p-8">
+                <div className="bg-white rounded-3xl border border-eco-200/60 p-4 sm:p-6 md:p-8">
                   <h4 className="text-xl font-bold mb-4 text-foreground">
                     السيارة الشخصية
                   </h4>
@@ -651,7 +652,7 @@ export default function AdvancedCarbonCalculator() {
                         <option value="electric">⚡ سيارة كهربائية</option>
                       </select>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold mb-2">
                           المسافة اليومية (كم)
@@ -703,7 +704,7 @@ export default function AdvancedCarbonCalculator() {
                 </div>
 
                 {/* Public Transport */}
-                <div className="bg-white rounded-3xl border border-eco-200/60 p-6 md:p-8">
+                <div className="bg-white rounded-3xl border border-eco-200/60 p-4 sm:p-6 md:p-8">
                   <h4 className="text-xl font-bold mb-4 text-foreground">
                     المواصلات العامة
                   </h4>
@@ -735,7 +736,7 @@ export default function AdvancedCarbonCalculator() {
                         <option value="tram">🚊 ترام</option>
                       </select>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-semibold mb-2">
                           المسافة اليومية (كم)
@@ -789,11 +790,11 @@ export default function AdvancedCarbonCalculator() {
                 </div>
 
                 {/* Flights */}
-                <div className="bg-white rounded-3xl border border-eco-200/60 p-6 md:p-8">
+                <div className="bg-white rounded-3xl border border-eco-200/60 p-4 sm:p-6 md:p-8">
                   <h4 className="text-xl font-bold mb-4 text-foreground">
                     الرحلات الجوية (سنوياً)
                   </h4>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-semibold mb-2">
                         رحلات قصيرة
@@ -1256,7 +1257,9 @@ export default function AdvancedCarbonCalculator() {
                 {footprintLevel.label}
               </span>
               <p className="text-sm opacity-90 mb-2">بصمتك الكربونية اليومية</p>
-              <p className="text-6xl font-black mb-2">{emissions.total}</p>
+              <p className="text-5xl sm:text-6xl font-black mb-2">
+                {emissions.total}
+              </p>
               <p className="text-lg font-semibold mb-4">كيلوغرام CO₂</p>
               <p className="text-sm opacity-90">
                 {(emissions.total * 365).toFixed(0)} كجم سنوياً
