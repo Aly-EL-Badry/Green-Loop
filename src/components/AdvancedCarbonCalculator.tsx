@@ -382,8 +382,8 @@ export default function AdvancedCarbonCalculator() {
     }
 
     if (
-      data.transportation.flights.longHaul === 0 &&
-      data.transportation.flights.shortHaul === 0
+     (data.transportation.flights?.longHaul ?? 0) === 0 &&
+     (data.transportation.flights?.shortHaul ?? 0) === 0
     ) {
       achievements.push({
         icon: "✈️",
@@ -439,8 +439,8 @@ export default function AdvancedCarbonCalculator() {
     }
 
     if (
-      data.transportation.flights.longHaul > 1 ||
-      data.transportation.flights.shortHaul > 4
+     (data.transportation.flights?.longHaul ?? 0) > 1 ||
+     (data.transportation.flights?.shortHaul ?? 0) > 4
     ) {
       tips.push({
         category: "transportation",
