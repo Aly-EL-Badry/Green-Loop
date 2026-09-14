@@ -110,13 +110,17 @@ export default function HeroSection() {
               style={{ animation: "fade-in-up 0.8s ease-out 1.2s forwards" }}
             >
               <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
-                🚗 النقل
-              </span>
-              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
-                🍔 الغذاء
+                🚗 المواصلات
               </span>
               <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
                 ⚡ الطاقة
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+                🍽️ الغذاء
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+                🛍️ الاستهلاك
+                   
               </span>
             </div>
           </div>
