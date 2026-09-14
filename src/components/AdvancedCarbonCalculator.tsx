@@ -1314,7 +1314,7 @@ export default function AdvancedCarbonCalculator() {
             </div>
 
             {/* Achievements */}
-            {achievements.length > 0 && (
+            {/* {achievements.length > 0 && (
               <div className="bg-white rounded-3xl border border-amber-200 p-6">
                 <h4 className="font-bold text-foreground mb-3">🏆 الإنجازات</h4>
                 <div className="grid grid-cols-2 gap-2">
@@ -1331,7 +1331,7 @@ export default function AdvancedCarbonCalculator() {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
