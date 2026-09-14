@@ -38,7 +38,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-24"
+      className="relative pt-28 pb-16 sm:pt-32 sm:pb-20 lg:min-h-screen lg:flex lg:items-center lg:pt-24 lg:pb-24"
     >
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-12 lg:px-16">
@@ -197,6 +197,10 @@ export default function HeroSection() {
                 flex items-center justify-center
                 transition-all duration-1000 ease-out
 
+                /* Reserve room above his head on mobile for the bubble */
+                mt-16
+                sm:mt-0
+
                 /* No shift on mobile — only nudge right once there's room */
                 sm:translate-x-2
                 md:translate-x-4
@@ -273,7 +277,7 @@ export default function HeroSection() {
                   z-20
 
                   /* Mobile: stay centered above Mr. Carbo, capped at the viewport width */
-                  -top-10
+                  -top-24
                   left-1/2
                   -translate-x-1/2
                   w-[85vw]

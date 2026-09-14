@@ -90,10 +90,10 @@ export default function Navbar() {
           </li>
           <li>
             <a
-              href="#contact"
+              href="#sponsors"
               className="text-white/90 hover:text-white hover:bg-white/10 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
             >
-              تواصل معنا
+              داعمينا
             </a>
           </li>
         </ul>
