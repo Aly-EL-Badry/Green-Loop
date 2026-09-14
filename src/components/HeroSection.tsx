@@ -17,9 +17,9 @@ export default function HeroSection() {
   const [bubbleVisible, setBubbleVisible] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animations
     const timer1 = setTimeout(() => setIsVisible(true), 200);
     const timer2 = setTimeout(() => setBubbleVisible(true), 1200);
+
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -28,6 +28,7 @@ export default function HeroSection() {
 
   const cycleFact = () => {
     setBubbleVisible(false);
+
     setTimeout(() => {
       setCurrentFact((prev) => (prev + 1) % carboFacts.length);
       setBubbleVisible(true);
@@ -37,49 +38,85 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden pt-32"
+      className="relative min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-24 overflow-x-hidden"
     >
-
-      {/* Main Content Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
-        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-4">
-          {/* ========================================
-              Right Side (in RTL = Right visually): Text Content
-              ======================================== */}
-          <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-right gap-10">
+      {/* Main Content */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-12 lg:px-16">
+        <div className="flex flex-col lg:flex-row items-center gap-12 sm:gap-14 lg:gap-4">
+          {/* ================================
+              TEXT CONTENT
+              ================================ */}
+          <div
+            className="
+              flex-1 w-full
+              flex flex-col
+              items-center lg:items-start
+              text-center lg:text-right
+              gap-7 sm:gap-8 lg:gap-9
+            "
+          >
             {/* Main Headline */}
             <h1
-              className="text-4xl md:text-5xl lg:text-[3.4rem] font-extrabold leading-tight text-foreground opacity-0"
-              style={{ animation: "fade-in-up 0.8s ease-out 0.3s forwards" }}
+              className="
+                text-3xl
+                sm:text-4xl
+                md:text-5xl
+                lg:text-[3.4rem]
+                font-extrabold
+                leading-[1.35]
+                text-foreground
+                opacity-0
+                max-w-2xl
+              "
+              style={{
+                animation: "fade-in-up 0.8s ease-out 0.3s forwards",
+              }}
             >
               أثرك البيئي يبدأ
               <br />
-              <span className="text-eco-600 inline-block mt-3">
+              <span className="text-eco-600 inline-block mt-2 sm:mt-3">
                 من عاداتك اليومية
               </span>
             </h1>
 
             {/* Sub-caption */}
             <p
-              className="text-lg md:text-xl text-gray-500 max-w-lg leading-relaxed font-normal opacity-0"
-              style={{ animation: "fade-in-up 0.8s ease-out 0.6s forwards" }}
+              className="
+                text-base
+                sm:text-lg
+                md:text-xl
+                text-gray-500
+                max-w-lg
+                leading-[1.9]
+                font-normal
+                opacity-0
+              "
+              style={{
+                animation: "fade-in-up 0.8s ease-out 0.6s forwards",
+              }}
             >
-              كل كيلومتر تقطعه، كل وجبة تتناولها، وكل كيلوواط تستهلكه يترك
-              بصمة على كوكبنا. اكتشف أثرك البيئي وابدأ بالتغيير اليوم.
+              كل كيلومتر تقطعه، كل وجبة تتناولها، وكل كيلوواط تستهلكه يترك بصمة
+              على كوكبنا. اكتشف أثرك البيئي وابدأ بالتغيير اليوم.
             </p>
 
-            {/* CTA Button */}
+            {/* CTA */}
             <div
               className="opacity-0"
-              style={{ animation: "fade-in-up 0.8s ease-out 0.9s forwards" }}
+              style={{
+                animation: "fade-in-up 0.8s ease-out 0.9s forwards",
+              }}
             >
               <a
                 href="#calculator"
                 className="
                   inline-flex items-center gap-3
                   bg-eco-600 hover:bg-eco-700
-                  text-white text-lg font-bold
-                  px-8 py-4 rounded-2xl
+                  text-white
+                  text-base sm:text-lg
+                  font-bold
+                  px-7 sm:px-8
+                  py-3.5 sm:py-4
+                  rounded-2xl
                   shadow-glow hover:shadow-glow-lg
                   transition-all duration-300 ease-out
                   hover:-translate-y-0.5
@@ -87,9 +124,14 @@ export default function HeroSection() {
                 "
               >
                 <span>جرّب الآن</span>
-                {/* Leaf arrow icon */}
+
                 <svg
-                  className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1 rtl:group-hover:translate-x-1"
+                  className="
+                    w-5 h-5
+                    transition-transform duration-300
+                    group-hover:-translate-x-1
+                    rtl:group-hover:translate-x-1
+                  "
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={2.5}
@@ -104,61 +146,147 @@ export default function HeroSection() {
               </a>
             </div>
 
-            {/* Quick stats badges */}
+            {/* Quick stats */}
             <div
-              className="flex flex-wrap gap-3 mt-2 opacity-0"
-              style={{ animation: "fade-in-up 0.8s ease-out 1.2s forwards" }}
+              className="
+                flex flex-wrap
+                justify-center lg:justify-start
+                gap-2.5 sm:gap-3
+                mt-1
+                max-w-xl
+                opacity-0
+              "
+              style={{
+                animation: "fade-in-up 0.8s ease-out 1.2s forwards",
+              }}
             >
-              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-1.5 rounded-full border border-eco-100">
                 🚗 المواصلات
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-1.5 rounded-full border border-eco-100">
                 ⚡ الطاقة
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-1.5 rounded-full border border-eco-100">
                 🍽️ الغذاء
               </span>
-              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs font-semibold px-3.5 py-1.5 rounded-full border border-eco-100">
+
+              <span className="inline-flex items-center gap-1.5 bg-eco-50 text-eco-700 text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-1.5 rounded-full border border-eco-100">
                 🛍️ الاستهلاك
-                   
               </span>
             </div>
           </div>
 
-          {/* ========================================
-              Left Side (in RTL = Left visually): Mr. Carbo
-              ======================================== */}
-          <div className="relative flex-1 flex items-center justify-center lg:justify-end">
-            {/* Mr. Carbo Image with entrance animation */}
+          {/* ================================
+              MR. CARBO
+              ================================ */}
+          <div
+            className="
+              relative
+              flex-1
+              w-full
+              flex items-center justify-center
+              lg:justify-end
+              overflow-visible
+            "
+          >
             <div
-              className={`relative transition-all duration-1000 ease-out ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
-              }`}
-              style={{ animation: isVisible ? "float 4s ease-in-out infinite 1.5s" : "none" }}
+              className={`
+                relative
+                flex items-center justify-center
+                transition-all duration-1000 ease-out
+
+                /* Move Mr. Carbo slightly to the right */
+                translate-x-3
+                sm:translate-x-4
+                md:translate-x-6
+                lg:translate-x-8
+                xl:translate-x-12
+
+                ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }
+              `}
+              style={{
+                animation: isVisible
+                  ? "float 4s ease-in-out infinite 1.5s"
+                  : "none",
+              }}
             >
+              {/* Mr. Carbo */}
               <button
                 onClick={cycleFact}
-                className="cursor-pointer focus:outline-none group relative"
+                className="
+                  cursor-pointer
+                  focus:outline-none
+                  focus-visible:ring-2
+                  focus-visible:ring-eco-500
+                  rounded-3xl
+                  group
+                  relative
+                  z-10
+                "
                 aria-label="انقر لنصيحة بيئية جديدة"
               >
-                <Image
-                  src="/mrCarbo.png"
-                  alt="مستر كاربو - دليلك لحياة أقل كربوناً"
-                  width={420}
-                  height={520}
-                  priority
-                  className="drop-shadow-2xl group-hover:scale-[1.02] transition-transform duration-300 relative z-10"
-                />
+                <div
+                  className="
+                    relative
+                    w-[230px]
+                    sm:w-[280px]
+                    md:w-[330px]
+                    lg:w-[380px]
+                    xl:w-[420px]
+                  "
+                >
+                  <Image
+                    src="/mrCarbo.png"
+                    alt="مستر كاربو - دليلك لحياة أقل كربوناً"
+                    width={420}
+                    height={520}
+                    priority
+                    sizes="
+                      (max-width: 640px) 230px,
+                      (max-width: 768px) 280px,
+                      (max-width: 1024px) 330px,
+                      (max-width: 1280px) 380px,
+                      420px
+                    "
+                    className="
+                      w-full
+                      h-auto
+                      drop-shadow-2xl
+                      group-hover:scale-[1.02]
+                      transition-transform duration-300
+                    "
+                  />
+                </div>
               </button>
 
-              {/* Speech Bubble */}
+              {/* ================================
+                  SPEECH BUBBLE
+                  ================================ */}
               <div
                 className={`
-                  absolute -top-4 right-[60%] lg:right-[70%] z-20
-                  max-w-xs w-72
+                  absolute
+                  z-20
+
+                  /* Desktop positioning */
+                  -top-8
+                  right-[55%]
+                  lg:-top-6
+                  lg:right-[65%]
+
+                  /* Keep bubble from becoming too wide */
+                  w-[260px]
+                  sm:w-[290px]
+                  lg:w-72
+                  max-w-[calc(100vw-2rem)]
+
                   transition-all duration-500 ease-out
+
                   ${
                     bubbleVisible
                       ? "opacity-100 scale-100 translate-y-0"
@@ -170,11 +298,21 @@ export default function HeroSection() {
                   <p className="text-sm leading-relaxed text-eco-900 font-medium">
                     {carboFacts[currentFact]}
                   </p>
-                  {/* Arrow pointing to Mr. Carbo's mouth */}
+
+                  {/* Bubble arrow */}
                   <div
-                    className="absolute -bottom-2.5 right-8 w-5 h-5 bg-white border-b border-r border-eco-100 transform rotate-45"
+                    className="
+                      absolute
+                      -bottom-2.5
+                      right-8
+                      w-5 h-5
+                      bg-white
+                      border-b border-r border-eco-100
+                      rotate-45
+                    "
                   />
                 </div>
+
                 {/* Click hint */}
                 <p className="text-[10px] text-eco-400 mt-2 text-center opacity-70">
                   اضغط على مستر كاربو لنصيحة جديدة ☝️
