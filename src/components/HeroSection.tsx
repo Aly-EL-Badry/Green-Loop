@@ -194,12 +194,10 @@ export default function HeroSection() {
             <div
               className={`
                 relative
-                flex items-center justify-center
+                flex flex-col-reverse items-center justify-center
+                sm:flex-row
+                gap-4 sm:gap-0
                 transition-all duration-1000 ease-out
-
-                /* Reserve room above his head on mobile for the bubble */
-                mt-16
-                sm:mt-0
 
                 /* No shift on mobile — only nudge right once there's room */
                 sm:translate-x-2
@@ -273,23 +271,18 @@ export default function HeroSection() {
                   ================================ */}
               <div
                 className={`
-                  absolute
+                  relative
                   z-20
-
-                  /* Mobile: stay centered above Mr. Carbo, capped at the viewport width */
-                  -top-24
-                  left-1/2
-                  -translate-x-1/2
                   w-[85vw]
-                  max-w-[240px]
+                  max-w-[280px]
 
-                  /* sm and up: switch to the RTL upper-left offset, no vw dependency */
-                  sm:left-auto
-                  sm:translate-x-0
-                  sm:right-[40%]
-                  sm:-top-8
+                  /* sm and up: switch to the RTL upper-left overlap layout */
+                  sm:absolute
                   sm:w-[280px]
                   sm:max-w-none
+                  sm:left-auto
+                  sm:right-[40%]
+                  sm:-top-8
 
                   lg:-top-6
                   lg:right-[60%]
