@@ -16,12 +16,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="ar" dir="rtl" className={`${alexandria.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased bg-white">
+    <html
+      lang="ar"
+      dir="rtl"
+      className={`${alexandria.variable} h-full`}
+      suppressHydrationWarning
+    >
+      <body
+        className="min-h-full flex flex-col antialiased bg-white"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>
