@@ -38,7 +38,7 @@ export default function HeroSection() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-24 overflow-x-hidden"
+      className="relative min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-24"
     >
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 md:px-12 lg:px-16">
@@ -197,10 +197,9 @@ export default function HeroSection() {
                 flex items-center justify-center
                 transition-all duration-1000 ease-out
 
-                /* Move Mr. Carbo slightly to the right */
-                translate-x-3
-                sm:translate-x-4
-                md:translate-x-6
+                /* No shift on mobile — only nudge right once there's room */
+                sm:translate-x-2
+                md:translate-x-4
                 lg:translate-x-8
                 xl:translate-x-12
 
@@ -273,17 +272,24 @@ export default function HeroSection() {
                   absolute
                   z-20
 
-                  /* Desktop positioning */
-                  -top-8
-                  right-[55%]
-                  lg:-top-6
-                  lg:right-[65%]
+                  /* Mobile: stay centered above Mr. Carbo, capped at the viewport width */
+                  -top-10
+                  left-1/2
+                  -translate-x-1/2
+                  w-[85vw]
+                  max-w-[240px]
 
-                  /* Keep bubble from becoming too wide */
-                  w-[260px]
-                  sm:w-[290px]
+                  /* sm and up: switch to the RTL upper-left offset, no vw dependency */
+                  sm:left-auto
+                  sm:translate-x-0
+                  sm:right-[40%]
+                  sm:-top-8
+                  sm:w-[280px]
+                  sm:max-w-none
+
+                  lg:-top-6
+                  lg:right-[60%]
                   lg:w-72
-                  max-w-[calc(100vw-2rem)]
 
                   transition-all duration-500 ease-out
 
@@ -304,6 +310,9 @@ export default function HeroSection() {
                     className="
                       absolute
                       -bottom-2.5
+                      left-1/2 -translate-x-1/2
+                      sm:left-auto sm:translate-x-0
+                      sm:right-8
                       right-8
                       w-5 h-5
                       bg-white
