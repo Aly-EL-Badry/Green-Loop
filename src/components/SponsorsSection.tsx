@@ -15,7 +15,7 @@ export default function SponsorsSection() {
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
 
     if (sectionRef.current) {
@@ -36,9 +36,7 @@ export default function SponsorsSection() {
         {/* Section Header & Thank You Message */}
         <div
           className={`text-center mb-12 md:mb-16 transition-all duration-700 ${
-            isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-6"
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
           {/* Badge */}
@@ -48,23 +46,20 @@ export default function SponsorsSection() {
           </div>
 
           <h2 className="text-3xl md:text-5xl font-extrabold text-foreground mb-6 leading-tight">
-            شكراً لمن منحنا{" "}
-            <span className="text-eco-600">هذه الفرصة</span>
+            شكراً لمن منحنا <span className="text-eco-600">هذه الفرصة</span>
           </h2>
 
           <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-medium">
-            نتقدم بخالص الشكر والتقدير إلى صُنّاع هذا الحدث والجهات الكريمة الراعية
-            على إتاحة هذه الفرصة القيمة وثقتهم ودعمهم المتواصل لنشر الوعي البيئي
-            وتحقيق مستقبل أكثر خضرة واستدامة.
+            نتقدم بخالص الشكر والتقدير إلى صُنّاع هذا الحدث والجهات الكريمة
+            الراعية على إتاحة هذه الفرصة القيمة وثقتهم ودعمهم المتواصل لنشر
+            الوعي البيئي وتحقيق مستقبل أكثر خضرة واستدامة.
           </p>
         </div>
 
         {/* Event Makers Logos Showcase */}
         <div
           className={`relative group max-w-5xl mx-auto transition-all duration-700 delay-200 ${
-            isVisible
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
           {/* Ambient Glow */}
@@ -107,4 +102,3 @@ export default function SponsorsSection() {
     </section>
   );
 }
-

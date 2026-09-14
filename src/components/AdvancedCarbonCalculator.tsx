@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface DetailedData {
   transportation: {
@@ -26,7 +26,7 @@ interface DetailedData {
   electricity: {
     source: "coal" | "gas" | "renewable" | "mixed";
     usage: number; // kWh per day
-    heating: "electric" | "gas" | "none";
+    heating: "ac" | "electric" | "gas" | "none";
     heatingUsage: number; // therms per month
   };
   food: {
@@ -54,6 +54,7 @@ interface Achievement {
 
 export default function AdvancedCarbonCalculator() {
   const [step, setStep] = useState(1);
+  const tipsRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<DetailedData>({
     transportation: {
       car: { type: "sedan", distance: 25, days: 5 },
@@ -63,7 +64,7 @@ export default function AdvancedCarbonCalculator() {
     electricity: {
       source: "mixed",
       usage: 18,
-      heating: "gas",
+      heating: "ac",
       heatingUsage: 3,
     },
     food: {
@@ -146,8 +147,11 @@ export default function AdvancedCarbonCalculator() {
       data.electricity.usage * sourceEmissions[data.electricity.source];
     energyTotal += electricityKg;
 
-    // Heating
-    if (data.electricity.heating === "electric") {
+    // Heating / Cooling
+    if (
+      data.electricity.heating === "ac" ||
+      data.electricity.heating === "electric"
+    ) {
       energyTotal += (data.electricity.heatingUsage * 5.3) / 30; // kWh equivalent
     } else if (data.electricity.heating === "gas") {
       energyTotal += (data.electricity.heatingUsage * 1.89) / 30; // gas to kg CO2
@@ -346,37 +350,64 @@ export default function AdvancedCarbonCalculator() {
 
   const comparisons = getComparisons();
 
-  // Tips
+  // Tips — tagged by category so they can be prioritized by the actual result
   const generateAdvancedTips = () => {
-    const tips: string[] = [];
+    const tips: { category: string; text: string }[] = [];
 
     // Transport tips
-    if (data.transportation.car?.type === "sedan" && data.transportation.car?.distance > 20) {
-      tips.push(
-        "🚗 تبديل السيارة الكلاسيكية بسيارة كهربائية يوفر ~80% من انبعاثات المواصلات"
-      );
+    if (
+      data.transportation.car?.type === "sedan" &&
+      data.transportation.car?.distance > 20
+    ) {
+      tips.push({
+        category: "transportation",
+        text: "🚗 تبديل السيارة الكلاسيكية بسيارة كهربائية يوفر ~80% من انبعاثات المواصلات",
+      });
     }
 
     if (
       !data.transportation.publicTransport ||
       data.transportation.publicTransport.days < 3
     ) {
-      tips.push(
-        "🚌 زيادة استخدام المواصلات العامة إلى 3+ أيام أسبوعياً توفر ~2 كجم CO2 يومياً"
-      );
+      tips.push({
+        category: "transportation",
+        text: "🚌 زيادة استخدام المواصلات العامة إلى 3+ أيام أسبوعياً توفر ~2 كجم CO2 يومياً",
+      });
+    }
+
+    if (
+      data.transportation.flights.longHaul > 1 ||
+      data.transportation.flights.shortHaul > 4
+    ) {
+      tips.push({
+        category: "transportation",
+        text: "✈️ تقليل الرحلات الجوية هو أسرع طريقة لخفض الانبعاثات (رحلة طويلة = شهر من الانبعاثات)",
+      });
     }
 
     // Energy tips
+    if (
+      data.electricity.heating === "ac" &&
+      data.electricity.heatingUsage > 200
+    ) {
+      tips.push({
+        category: "energy",
+        text: "❄️ رفع حرارة التكييف درجة أو درجتين فقط يوفر حتى 10% من استهلاك التبريد",
+      });
+    }
+
     if (data.electricity.source !== "renewable") {
-      tips.push(
-        "☀️ التحول للطاقة المتجددة يقلل انبعاثات الكهرباء بمعدل 80-90%"
-      );
+      tips.push({
+        category: "energy",
+        text: "☀️ التحول للطاقة المتجددة يقلل انبعاثات الكهرباء بمعدل 80-90%",
+      });
     }
 
     if (data.electricity.usage > 20) {
-      tips.push(
-        "⚡ استخدام أجهزة موفرة للطاقة و LED يوفر 30-40% من فاتورة الكهرباء"
-      );
+      tips.push({
+        category: "energy",
+        text: "⚡ استخدام أجهزة موفرة للطاقة و LED يوفر 30-40% من فاتورة الكهرباء",
+      });
     }
 
     // Food tips
@@ -386,46 +417,65 @@ export default function AdvancedCarbonCalculator() {
       (data.food.dinner === "vegan" ? 1 : 0);
 
     if (veganMeals < 2) {
-      tips.push(
-        "🌱 جعل وجبتين نباتيتين يومياً يقلل انبعاثات الغذاء بمعدل 40%"
-      );
+      tips.push({
+        category: "food",
+        text: "🌱 جعل وجبتين نباتيتين يومياً يقلل انبعاثات الغذاء بمعدل 40%",
+      });
     }
 
     if (!data.food.localProduce) {
-      tips.push("🥬 شراء المنتجات المحلية يوفر انبعاثات النقل (15% توفير)");
+      tips.push({
+        category: "food",
+        text: "🥬 شراء المنتجات المحلية يوفر انبعاثات النقل (15% توفير)",
+      });
     }
 
     if (!data.food.organic) {
-      tips.push("🍃 المنتجات العضوية توفر 10% من انبعاثات الإنتاج");
+      tips.push({
+        category: "food",
+        text: "🍃 المنتجات العضوية توفر 10% من انبعاثات الإنتاج",
+      });
     }
 
     // Consumption tips
     if (data.consumption.clothing !== "minimal") {
-      tips.push(
-        "👕 شراء ملابس مستعملة أو من مصادر مستدامة يوفر 60% من الانبعاثات"
-      );
+      tips.push({
+        category: "consumption",
+        text: "👕 شراء ملابس مستعملة أو من مصادر مستدامة يوفر 60% من الانبعاثات",
+      });
     }
 
     if (data.consumption.waste !== "recycle-all") {
-      tips.push(
-        "♻️ إعادة تدوير كاملة تقلل نفايات الاستهلاك إلى الحد الأدنى"
-      );
-    }
-
-    // Flights
-    if (
-      data.transportation.flights.longHaul > 1 ||
-      data.transportation.flights.shortHaul > 4
-    ) {
-      tips.push(
-        "✈️ تقليل الرحلات الجوية هو أسرع طريقة لخفض الانبعاثات (رحلة طويلة = شهر من الانبعاثات)"
-      );
+      tips.push({
+        category: "consumption",
+        text: "♻️ إعادة تدوير كاملة تقلل نفايات الاستهلاك إلى الحد الأدنى",
+      });
     }
 
     return tips;
   };
 
-  const tips = generateAdvancedTips();
+  const rawTips = generateAdvancedTips();
+
+  // Prioritize tips from whichever category contributes most to this result
+  const dominantCategory = Object.entries(emissions.breakdown).sort(
+    (a, b) => b[1] - a[1],
+  )[0]?.[0];
+
+  const tips = [...rawTips].sort((a, b) => {
+    if (a.category === dominantCategory && b.category !== dominantCategory)
+      return -1;
+    if (b.category === dominantCategory && a.category !== dominantCategory)
+      return 1;
+    return 0;
+  });
+
+  const categoryLabels: Record<string, string> = {
+    transportation: "المواصلات",
+    energy: "الطاقة",
+    food: "الغذاء",
+    consumption: "الاستهلاك",
+  };
 
   const allSteps = [
     {
@@ -455,7 +505,10 @@ export default function AdvancedCarbonCalculator() {
   ];
 
   return (
-    <section id="calculator" className="relative min-h-screen bg-gradient-to-b from-white to-eco-50/40 py-16 md:py-24 px-6 md:px-12 lg:px-16">
+    <section
+      id="calculator"
+      className="relative min-h-screen bg-gradient-to-b from-white to-eco-50/40 py-16 md:py-24 px-6 md:px-12 lg:px-16"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -463,7 +516,8 @@ export default function AdvancedCarbonCalculator() {
             حاسبة البصمة الكربونية المتقدمة
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            اكتشف تأثيرك البيئي بتفاصيل دقيقة واحصل على نصائح مخصصة لتقليل انبعاثاتك
+            اكتشف تأثيرك البيئي بتفاصيل دقيقة واحصل على نصائح مخصصة لتقليل
+            انبعاثاتك
           </p>
         </div>
 
@@ -590,7 +644,9 @@ export default function AdvancedCarbonCalculator() {
                         نوع المواصلة
                       </label>
                       <select
-                        value={data.transportation.publicTransport?.type || "bus"}
+                        value={
+                          data.transportation.publicTransport?.type || "bus"
+                        }
                         onChange={(e) =>
                           setData({
                             ...data,
@@ -611,44 +667,54 @@ export default function AdvancedCarbonCalculator() {
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <input
-                        type="number"
-                        placeholder="المسافة (كم)"
-                        value={data.transportation.publicTransport?.distance || 0}
-                        onChange={(e) =>
-                          setData({
-                            ...data,
-                            transportation: {
-                              ...data.transportation,
-                              publicTransport: {
-                                ...data.transportation.publicTransport!,
-                                distance: parseFloat(e.target.value) || 0,
+                      <div>
+                        <label className="block text-sm font-semibold mb-2">
+                          المسافة اليومية (كم)
+                        </label>
+                        <input
+                          type="number"
+                          value={
+                            data.transportation.publicTransport?.distance || 0
+                          }
+                          onChange={(e) =>
+                            setData({
+                              ...data,
+                              transportation: {
+                                ...data.transportation,
+                                publicTransport: {
+                                  ...data.transportation.publicTransport!,
+                                  distance: parseFloat(e.target.value) || 0,
+                                },
                               },
-                            },
-                          })
-                        }
-                        className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
-                      />
-                      <input
-                        type="number"
-                        placeholder="أيام الأسبوع"
-                        min="0"
-                        max="7"
-                        value={data.transportation.publicTransport?.days || 0}
-                        onChange={(e) =>
-                          setData({
-                            ...data,
-                            transportation: {
-                              ...data.transportation,
-                              publicTransport: {
-                                ...data.transportation.publicTransport!,
-                                days: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold mb-2">
+                          أيام في الأسبوع
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="7"
+                          value={data.transportation.publicTransport?.days || 0}
+                          onChange={(e) =>
+                            setData({
+                              ...data,
+                              transportation: {
+                                ...data.transportation,
+                                publicTransport: {
+                                  ...data.transportation.publicTransport!,
+                                  days: parseFloat(e.target.value) || 0,
+                                },
                               },
-                            },
-                          })
-                        }
-                        className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
-                      />
+                            })
+                          }
+                          className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -718,6 +784,56 @@ export default function AdvancedCarbonCalculator() {
                 <div className="bg-white rounded-3xl border border-eco-200/60 p-6 md:p-8 space-y-4">
                   <div>
                     <label className="block text-sm font-semibold mb-2">
+                      التكييف / التدفئة
+                    </label>
+                    <select
+                      value={data.electricity.heating}
+                      onChange={(e) =>
+                        setData({
+                          ...data,
+                          electricity: {
+                            ...data.electricity,
+                            heating: e.target.value as any,
+                          },
+                        })
+                      }
+                      className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 focus:ring-2 focus:ring-eco-100 outline-none"
+                    >
+                      <option value="ac">❄️ تكييف</option>
+                      <option value="electric">⚡ كهربائية</option>
+                      <option value="gas">🔥 غاز</option>
+                      <option value="none">❌ بدون تدفئة/تبريد</option>
+                    </select>
+                  </div>
+
+                  {data.electricity.heating !== "none" && (
+                    <div>
+                      <label className="block text-sm font-semibold mb-2">
+                        الاستهلاك الشهري (
+                        {data.electricity.heating === "gas"
+                          ? "ثيرم"
+                          : "كيلوواط"}
+                        )
+                      </label>
+                      <input
+                        type="number"
+                        value={data.electricity.heatingUsage}
+                        onChange={(e) =>
+                          setData({
+                            ...data,
+                            electricity: {
+                              ...data.electricity,
+                              heatingUsage: parseFloat(e.target.value) || 0,
+                            },
+                          })
+                        }
+                        className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm font-semibold mb-2">
                       مصدر الكهرباء
                     </label>
                     <select
@@ -762,51 +878,6 @@ export default function AdvancedCarbonCalculator() {
                       💡 المتوسط: 15-20 كيلوواط/ساعة
                     </p>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">
-                      نوع التدفئة
-                    </label>
-                    <select
-                      value={data.electricity.heating}
-                      onChange={(e) =>
-                        setData({
-                          ...data,
-                          electricity: {
-                            ...data.electricity,
-                            heating: e.target.value as any,
-                          },
-                        })
-                      }
-                      className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 focus:ring-2 focus:ring-eco-100 outline-none"
-                    >
-                      <option value="none">❌ بدون تدفئة</option>
-                      <option value="gas">🔥 غاز</option>
-                      <option value="electric">⚡ كهربائية</option>
-                    </select>
-                  </div>
-
-                  {data.electricity.heating !== "none" && (
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">
-                        الاستهلاك الشهري ({data.electricity.heating === "gas" ? "ثيرم" : "كيلوواط"})
-                      </label>
-                      <input
-                        type="number"
-                        value={data.electricity.heatingUsage}
-                        onChange={(e) =>
-                          setData({
-                            ...data,
-                            electricity: {
-                              ...data.electricity,
-                              heatingUsage: parseFloat(e.target.value) || 0,
-                            },
-                          })
-                        }
-                        className="w-full px-4 py-3 rounded-xl border border-eco-200 focus:border-eco-600 outline-none"
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -823,7 +894,11 @@ export default function AdvancedCarbonCalculator() {
                   {["breakfast", "lunch", "dinner"].map((meal, idx) => (
                     <div key={meal}>
                       <label className="block text-sm font-semibold mb-3">
-                        {idx === 0 ? "🌅 الإفطار" : idx === 1 ? "🌞 الغداء" : "🌙 العشاء"}
+                        {idx === 0
+                          ? "🌅 الإفطار"
+                          : idx === 1
+                            ? "🌞 الغداء"
+                            : "🌙 العشاء"}
                       </label>
                       <div className="grid grid-cols-3 gap-2">
                         {["vegan", "vegetarian", "meat"].map((type) => (
@@ -1020,12 +1095,15 @@ export default function AdvancedCarbonCalculator() {
                               className="w-4 h-4 text-eco-600"
                             />
                             <span className="font-medium text-gray-700">
-                              {level === "recycle-all" && "✅ أعيد تدوير كل شيء"}
-                              {level === "recycle-most" && "🟡 أعيد تدوير معظمه"}
-                              {level === "little-recycle" && "❌ إعادة تدوير قليلة"}
+                              {level === "recycle-all" &&
+                                "✅ أعيد تدوير كل شيء"}
+                              {level === "recycle-most" &&
+                                "🟡 أعيد تدوير معظمه"}
+                              {level === "little-recycle" &&
+                                "❌ إعادة تدوير قليلة"}
                             </span>
                           </label>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -1083,9 +1161,15 @@ export default function AdvancedCarbonCalculator() {
                 </button>
               ) : (
                 <button
+                  onClick={() =>
+                    tipsRef.current?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    })
+                  }
                   className="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-eco-600 to-eco-700 text-white hover:shadow-lg transition-all"
                 >
-                  ✓ حساب النتائج
+                  💡 شاهد توصيات خفض البصمة
                 </button>
               )}
             </div>
@@ -1118,7 +1202,9 @@ export default function AdvancedCarbonCalculator() {
                       {key === "food" && "🍽️ الغذاء"}
                       {key === "consumption" && "🛍️ الاستهلاك"}
                     </span>
-                    <span className="font-bold text-eco-600">{value.toFixed(2)} كجم</span>
+                    <span className="font-bold text-eco-600">
+                      {value.toFixed(2)} كجم
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1129,8 +1215,12 @@ export default function AdvancedCarbonCalculator() {
               <h4 className="font-bold text-foreground mb-4">🌍 المقارنات</h4>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">🌳 أشجار مطلوبة (سنوياً)</span>
-                  <span className="font-bold text-eco-700">{comparisons.treesNeeded}</span>
+                  <span className="text-gray-600">
+                    🌳 أشجار مطلوبة (سنوياً)
+                  </span>
+                  <span className="font-bold text-eco-700">
+                    {comparisons.treesNeeded}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">🚗 سيارات مكافئة</span>
@@ -1171,22 +1261,36 @@ export default function AdvancedCarbonCalculator() {
 
         {/* Tips Section */}
         {tips.length > 0 && (
-          <div className="mt-12">
+          <div ref={tipsRef} className="mt-12 scroll-mt-6">
             <div className="bg-gradient-to-r from-eco-500/10 to-eco-600/10 border-2 border-eco-300/50 rounded-3xl p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-3">
                 <span className="text-3xl">💡</span>
                 <h4 className="text-2xl font-bold text-foreground">
                   نصائح مخصصة لتقليل أثرك
                 </h4>
               </div>
 
+              {dominantCategory && (
+                <p className="text-sm text-eco-700 font-semibold mb-6">
+                  🔍 أكبر مصدر لبصمتك حالياً هو{" "}
+                  <span className="underline">
+                    {categoryLabels[dominantCategory]}
+                  </span>
+                  ، لذلك رتّبنا التوصيات التالية لتبدأ منه.
+                </p>
+              )}
+
               <div className="grid md:grid-cols-2 gap-4">
                 {tips.map((tip, index) => (
                   <div
                     key={index}
-                    className="bg-white rounded-2xl p-5 border border-eco-200/60 hover:border-eco-400/60 hover:shadow-md transition-all"
+                    className={`bg-white rounded-2xl p-5 border transition-all ${
+                      tip.category === dominantCategory
+                        ? "border-eco-400 shadow-md"
+                        : "border-eco-200/60 hover:border-eco-400/60 hover:shadow-md"
+                    }`}
                   >
-                    <p className="text-gray-700 font-medium">{tip}</p>
+                    <p className="text-gray-700 font-medium">{tip.text}</p>
                   </div>
                 ))}
               </div>
