@@ -18,8 +18,7 @@ This repository contains **Green-Loop**, a Next.js and Tailwind CSS landing page
        - Background shape: Green angled polygon (~25% page width) with light green shadow, flowing into next section.
    - **Sponsors & Event Partners Section**:
      - Located below hero.
-     - Features a reversed angled polygon on top-left to seamlessly continue the geometric line.
-     - Showcases partner/sponsor companies supporting the climate event with clean cards.
+     - Features official event makers logo banner (`/eventmakers.png`) and heartfelt thank-you message acknowledging their support and opportunity.
 4. **Character**:
    - **Mr. Carbo** is in `public/mrCarbo.png`. He is the central mascot and guide for the website.
 5. **Tech Stack**:
